@@ -28,6 +28,7 @@ test_mask = test_df['attention_mask']
 
 x_test_array = np.array(x_test.tolist())
 test_mask_array = np.array(test_mask.tolist())
+print(x_test_array)
 
 model_classification = tf.keras.models.load_model('model/bert_model.h5',custom_objects={'TFBertModel':TFBertModel})
 
