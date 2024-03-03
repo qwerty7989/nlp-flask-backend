@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from nlp import calculate_value
+from nlp import nlp
 
 app = Flask(__name__)
 
@@ -10,5 +10,6 @@ def index():
 @app.route("/result")
 def result():
         text = request.args.get('text')
-        percentage = calculate_value(text)
+        nlp_runtime = nlp(text)
+        percentage = nlp_runtime.result
         return f'You enter {text} and it is probably {percentage}'
