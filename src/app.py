@@ -10,6 +10,6 @@ def index():
 @app.route("/result")
 def result():
         text = request.args.get('text')
-        nlp_runtime = nlp(text)
-        percentage = nlp_runtime.result
+        nlp_instance = nlp()
+        percentage = nlp_instance.calculate_value(text)
         return f'You enter {text} and it is probably {percentage}'
