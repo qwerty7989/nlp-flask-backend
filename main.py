@@ -3,11 +3,14 @@ from transformers import BertTokenizer, TFBertModel
 import re
 import pandas as pd
 import numpy as np
+from time import time
 
 def encode_text(text):
     bert_inp = tokenizer.encode_plus(text, add_special_tokens = True, max_length = 512, padding = 'max_length', return_attention_mask = True, truncation = True)
     id_text.append(bert_inp['input_ids'])
     mask_text.append(bert_inp['attention_mask'])
+
+start = time()
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = TFBertModel.from_pretrained('bert-base-uncased')
@@ -26,4 +29,4 @@ model_classification = tf.keras.models.load_model('model/bert_model.h5',custom_o
 
 result = model_classification.predict([id_text, mask_text])
 
-print(result)
+print(f"{result} spent time: {time() - start:.1f}s")
