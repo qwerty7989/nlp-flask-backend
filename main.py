@@ -25,7 +25,7 @@ encode_text(input_text)
 id_text = np.array(id_text)
 mask_text = np.array(mask_text)
 
-model_classification = tf.keras.models.load_model('model/bert_model.h5',custom_objects={'TFBertModel':TFBertModel})
+model_classification = tf.keras.models.load_model('model/bert_model.h5',custom_objects={'TFBertModel':model})
 
 result = model_classification.predict([id_text, mask_text])
 
