@@ -5,11 +5,19 @@ import tensorflow as tf
 import numpy as np
 import pandas as pd
 import re
-from time import time
+import google.generativeai as genai
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
 with app.app_context():
+        # Load Google API key & Gemini-Pro Model
+        load_dotenv()
+        GOOGLE_API_KEY=os.environ.get('GOOGLE_API_KEY')
+        genai.configure(api_key=GOOGLE_API_KEY)
+        gemini_pro_model = genai.GenerativeModel('gemini-pro')
+
         # Load Model
         BERT_tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
         BERT_model = TFAutoModel.from_pretrained('bert-base-uncased')
@@ -70,4 +78,13 @@ def result():
         return jsonify(
                 humen = str(result[0][0]),
                 ai = str(result[0][1])
+        )
+
+@app.route('/gemini', methods=['POST'])
+def gemini():
+        prompt_text = request.json.get('prompt')
+        response = gemini_pro_model.generate_content(prompt_text)
+
+        return jsonify(
+                text = response.text
         )
