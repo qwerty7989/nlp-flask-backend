@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from transformers import AutoTokenizer, TFAutoModel
 import sentencepiece
 import tensorflow as tf
@@ -27,21 +27,20 @@ with app.app_context():
 def index():
         return render_template('index.html')
 
-@app.route("/result")
+@app.route('/result', methods=['POST'])
 def result():
-        start_time = time()
-
         # Recieve & Clean data
-        input_text = request.args.get('text')
+        input_text = request.json.get('text')
         input_text = re.sub(r'\n+', ' ', input_text)
 
         # Recieve chosen model
-        chosen_model = request.args.get('model')
+        chosen_model = request.json.get('model')
 
         # Encoding data
         id_text = []
         mask_text = []
 
+        MODEL_INP = None
         if chosen_model == "bert":
                 MODEL_INP = BERT_tokenizer.encode_plus(input_text, add_special_tokens=True, max_length=512, padding='max_length', return_attention_mask=True, truncation=True)
         elif chosen_model == "deberta":
@@ -52,10 +51,15 @@ def result():
         id_text.append(MODEL_INP['input_ids'])
         mask_text.append(MODEL_INP['attention_mask'])
 
-        id_text = np.array(id_text)
-        mask_text = np.array(mask_text)
+        if chosen_model == "deberta" or chosen_model == "roberta":
+                id_text = np.array(id_text).reshape(1,512)
+                mask_text = np.array(mask_text).reshape(1,512)
+        else:
+                id_text = np.array(id_text)
+                mask_text = np.array(mask_text)
 
         # Predict
+        result = None
         if chosen_model == "bert":
                 result = BERT_classification.predict([id_text, mask_text])
         elif chosen_model == "deberta":
@@ -63,4 +67,7 @@ def result():
         elif chosen_model == "roberta":
                 result = ROBERTA_classification.predict([id_text, mask_text])
 
-        return f'You enter {input_text} and it is probably {result} and spent time {time()-start_time:.3f}'
+        return jsonify(
+                humen = str(result[0][0]),
+                ai = str(result[0][1])
+        )
