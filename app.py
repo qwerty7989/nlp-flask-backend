@@ -41,7 +41,7 @@ def index():
 def result():
         # Recieve & Clean data
         input_text = request.json.get('text')
-        input_text = re.sub(r'\n+', ' ', input_text)
+        input_text = input_text.replace(r'[\n*]', ' ').replace(r'\s+', ' ')
 
         # Recieve chosen model
         chosen_model = request.json.get('model')
