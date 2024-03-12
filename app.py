@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
+cors = CORS(app)
 
 with app.app_context():
         # Load Google API key & Gemini-Pro Model
